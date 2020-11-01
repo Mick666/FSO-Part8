@@ -41,29 +41,26 @@ const App = () => {
     return (
         <div>
             <div>
+                <button onCLick={logout} >logout</button>
                 <button onClick={() => setPage('authors')}>authors</button>
                 <button onClick={() => setPage('books')}>books</button>
                 <button onClick={() => setPage('add')}>add book</button>
             </div>
             <Notify errorMessage={errorMessage} />
-
-            {page === 'authors' ?
-                <Authors
-                    setError={notify}
-                    authors={authorResult.data.allAuthors}
-                />
-                : <div></div>}
+            <Authors
+                show={page === 'authors'}
+                setError={notify}
+                authors={authorResult.data.allAuthors}
+            />
             <Books
                 show={page === 'books'}
                 books={bookResult.data.allBooks}
             />
-            {page === 'add' ?
-                <NewBook
-                    setError={notify}
-                    setPage={setPage}
-                />
-                : <div></div>
-            }
+            <NewBook
+                show={page === 'add'}
+                setError={notify}
+                setPage={setPage}
+            />
         </div>
     )
 }
@@ -77,8 +74,8 @@ import Select from 'react-select'
 import { useMutation } from '@apollo/client'
 import { EDIT_AUTHOR } from '../queries'
 
-const Authors = ({ authors, setError }) => {
-    const [name, setName] = useState('')
+const Authors = ({ show, authors, setError }) => {
+    const [name, setName] = useState(null)
     const [setBornTo, setYear] = useState('')
     const authorNames = authors.map(a => { return { value: a.name, label: a.name } })
 
@@ -92,8 +89,12 @@ const Authors = ({ authors, setError }) => {
 
     const submit = async (event) => {
         event.preventDefault()
-
         changeBirthYear({ variables: { name, setBornTo } })
+        setName(null)
+    }
+
+    if (!show) {
+        return null
     }
 
     return (
@@ -123,7 +124,7 @@ const Authors = ({ authors, setError }) => {
                 <h2>Set author birthyear</h2>
                 <form onSubmit={submit}>
                     <Select
-                        value={name}
+                        value={ { value: name, label: name } }
                         onChange={(selectedOption) => setName(selectedOption.value)}
                         options={authorNames}
                     />
@@ -143,6 +144,7 @@ const Authors = ({ authors, setError }) => {
 }
 
 export default Authors
+
 
 //Queries.js
 

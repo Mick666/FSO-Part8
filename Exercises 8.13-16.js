@@ -165,10 +165,10 @@ const resolvers = {
     Query: {
         bookCount: () => Book.collection.countDocuments(),
         authorCount: () => Author.collection.countDocuments(),
-        allBooks: (root, args) => {
-            if (!args.author && !args.genre) return books
+        allBooks: async (root, args) => {
+            if (!args.author && !args.genre) return await Book.find({}).populate('author')
             else if (!args.author) {
-                return books.filter(book => book.genres.includes(args.genre))
+                return await Book.find({ genres: args.genre }).populate('author')
             } else if (!args.genre) {
                 return books.filter(book => book.author === args.author)
             } else {
